@@ -1,0 +1,38 @@
+name: Best Buy Price Monitor
+
+on:
+  schedule:
+    - cron: '*/10 * * * *' # 每10分钟执行一次
+  workflow_dispatch: # 允许手动触发执行
+
+jobs:
+  check-price:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 允许 Action 修改仓库文件
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npx playwright install chromium
+
+      - name: Run monitor script
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }} # 在仓库 Settings -> Secrets 中设置
+        run: node monitor.js
+
+      - name: Commit and push if price changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add last_price.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update last price" && git push)
