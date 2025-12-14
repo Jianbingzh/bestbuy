@@ -1,5 +1,4 @@
 const { chromium } = require("playwright");
-const axios = require("axios");
 const fs = require("fs");
 
 const URL = "https://www.bestbuy.com/product/apple-mac-mini-desktop-latest-model-m4-chip-built-for-apple-intelligence-16gb-memory-256gb-ssd-silver/JJGCQXH2S4";
