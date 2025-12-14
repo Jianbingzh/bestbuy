@@ -42,7 +42,7 @@ async function monitor() {
           body: ntfyMessage,
         });
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("Fetch error:", err, NOTIFY_URL);
       }
 
       // 保存新价格
