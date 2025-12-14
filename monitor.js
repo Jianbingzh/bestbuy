@@ -34,7 +34,7 @@ async function monitor() {
 
     // 对比价格
     if (currentPrice !== history.price) {
-      console.log("价格发生变化，发送通知...");
+      console.log("价格发生变化，发送通知...", NOTIFY_URL);
       try {
         const ntfyMessage = `${title}\n${history.price}=>${currentPrice}\n${URL}`;
         await fetch(NOTIFY_URL, {
