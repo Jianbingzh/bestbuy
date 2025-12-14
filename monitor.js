@@ -18,9 +18,10 @@ async function monitor() {
     await page.goto(URL, { waitUntil: "domcontentloaded", timeout: 60000 });
 
     // 提取商品名称
-    const title = await page.locator("h1.heading-5").innerText();
+    const title = await page.locator("h1.h4").innerText();
     // 提取价格 (根据页面结构，提取 $ 符号后的数字)
-    const priceText = await page.locator(".priceView-customer-price span").first().innerText();
+    // <div data-testid="price-block-customer-price" data-lu-target="customer_price" style="flex-direction:row"><span class="font-sans text-default text-style-body-md-400 font-500 text-7 leading-7">$599.00</span></div>
+    const priceText = await page.locator('div[data-testid="price-block-customer-price"]').innerText();
     const currentPrice = parseFloat(priceText.replace(/[^0-9.]/g, ""));
 
     console.log(`当前商品: ${title}`);
