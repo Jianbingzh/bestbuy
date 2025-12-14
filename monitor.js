@@ -36,13 +36,15 @@ async function monitor() {
     // 对比价格
     if (currentPrice !== history.price) {
       console.log("价格发生变化，发送通知...");
-      await axios.post(NOTIFY_URL, {
-        productName: title,
-        oldPrice: history.price,
-        newPrice: currentPrice,
-        url: URL,
-        timestamp: new Date().toISOString(),
-      });
+      try {
+        const ntfyMessage = `${title}\n${history.price}=>${currentPrice}\n${URL}`;
+        await fetch(NOTIFY_URL, {
+          method: "POST",
+          body: ntfyMessage,
+        });
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
 
       // 保存新价格
       fs.writeFileSync(DATA_FILE, JSON.stringify({ price: currentPrice, name: title }));
