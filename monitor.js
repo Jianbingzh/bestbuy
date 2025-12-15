@@ -34,7 +34,7 @@ async function monitor() {
         await page.goto(config.preClick.rootURL, { waitUntil: "domcontentloaded", timeout: 60000 });
         // 它会等待直到浏览器的 URL 匹配指定的模式或完成导航。
         const navigationPromise = page.waitForURL("**"); // '**' 表示等待任何 URL 变化
-        await page.locator(config.priceLocator).click();
+        await page.locator(config.preClick.clickLocator).click();
         // 等待点击引起的导航完成，并且新的 URL 可用
         await navigationPromise;
         afterClickURL = page.url();
