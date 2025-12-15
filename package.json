@@ -1,6 +1,10 @@
 {
   "name": "bestbuy-price-monitor",
   "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "bestbuy:monitor": "node monitor.js"
+  },
   "dependencies": {
     "playwright": "^1.40.0"
   }
