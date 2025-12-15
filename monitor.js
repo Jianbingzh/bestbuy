@@ -91,7 +91,7 @@ async function monitor() {
       if (currentPrice !== history.price) {
         console.log(`价格发生变化: $${history.price} => $${currentPrice}`);
         if (NOTIFY_URL) {
-          console.log("正在发送通知...", NOTIFY_URL);
+          console.log("正在发送通知...");
           try {
             const ntfyMessage = `${title.trim()}\nPrice: $${history.price} => $${currentPrice}\nURL: ${currentURL}`;
 
