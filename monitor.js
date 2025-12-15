@@ -48,7 +48,7 @@ async function monitor() {
       const title = await page.locator(config.titleLocator).innerText();
       // 提取价格 (根据页面结构，提取 $ 符号后的数字)
       // <div data-testid="price-block-customer-price" data-lu-target="customer_price" style="flex-direction:row"><span class="font-sans text-default text-style-body-md-400 font-500 text-7 leading-7">$599.00</span></div>
-      const priceText = await page.locator(config.priceLocator).innerText();
+      const priceText = await page.locator(config.priceLocator).innerText({ timeout: 60000 });
       const currentPrice = parseFloat(priceText.replace(/[^0-9.]/g, ""));
 
       console.log(`当前商品: ${title}`);
