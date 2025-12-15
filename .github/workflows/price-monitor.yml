@@ -1,35 +1,72 @@
-name: Best Buy Price Monitor
+name: Price Monitor with Caching
 
 on:
   schedule:
-    - cron: '*/10 * * * *' # 每10分钟执行一次。
-  workflow_dispatch: # 允许手动触发执行
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
 
 jobs:
-  check-price:
+  monitor_price:
     runs-on: ubuntu-latest
+
+    # 授权，以便您可以 checkout 代码和提交文件
     permissions:
-      contents: write # 允许 Action 修改仓库文件
+      contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20" # 确保使用您项目所需的 Node.js 版本
 
+      # --- 步骤 1: 缓存 Node.js 依赖 ---
+      - name: Cache Node Modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: node_modules # 要缓存的目录
+          # Key 包含操作系统和 package-lock.json 的 hash 值
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # --- 步骤 2: 安装 Node.js 依赖 (仅在缓存未命中时执行) ---
       - name: Install dependencies
-        run: |
-          npm install
-          npx playwright install chromium
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm ci # 推荐使用 npm ci，它更快，且依赖 package-lock.json
 
+      # --- 步骤 3: 缓存 Playwright 浏览器 ---
+      - name: Cache Playwright Browsers
+        id: cache-pw
+        uses: actions/cache@v4
+        with:
+          # Playwright 默认的浏览器安装路径
+          path: ~/.cache/ms-playwright
+          # Key 包含操作系统、Playwright 版本（从 package-lock.json 中读取）
+          # 和 Node.js 版本，确保环境完全匹配
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      # --- 步骤 4: 安装 Playwright 浏览器 (仅在缓存未命中时执行) ---
+      - name: Install Playwright Browsers
+        # 即使缓存命中，运行这个命令也是安全的，因为它会快速检查。
+        # 但为了节省时间，最好也加上 if 条件。
+        if: steps.cache-pw.outputs.cache-hit != 'true'
+        # --with-deps 可以确保 Playwright 依赖的系统库也安装到位
+        run: npx playwright install chromium --with-deps
+
+      # --- 步骤 5: 运行核心脚本 ---
       - name: Run monitor script
         env:
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }} # 在仓库 Settings -> Secrets 中设置
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: node monitor.js
 
+      # --- 步骤 6: 提交价格变化 (与您原有的持久化逻辑保持一致) ---
+      # ... 您的 git commit/push 逻辑 ...
       - name: Commit and push if price changed
         run: |
           git config --local user.email "action@github.com"
