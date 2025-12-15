@@ -18,14 +18,14 @@ const CONFIG_ITEMS = [
       "https://www.bestbuy.com/product/apple-mac-mini-desktop-latest-model-m4-chip-built-for-apple-intelligence-16gb-memory-256gb-ssd-silver/JJGCQXH2S4",
     titleLocator: "h1.h4",
     priceLocator: 'div[data-testid="price-block-customer-price"]',
-    saveLastPrice: "./mini_m4_last_price.json", // 路径将在 monitor 中解析
+    saveLastPrice: "mini_m4_last_price.json", // 路径将在 monitor 中解析
   },
   {
     preClick: { rootURL: "https://www.bestbuy.com/home", clickLocator: 'a.bottom-left-links:has-text("Deal of the Day")', haveURL: "/deal-of-the-day/" },
     productURL: null,
     titleLocator: "h2.product-title",
     priceLocator: 'div[data-testid="customer-price"]',
-    saveLastPrice: "./dealoftoday_last_price.json", // 路径将在 monitor 中解析
+    saveLastPrice: "dealoftoday_last_price.json", // 路径将在 monitor 中解析
   },
 ];
 
@@ -62,12 +62,9 @@ async function monitor() {
 
       const priceLocator = page.locator(config.priceLocator);
       // 确保价格元素存在并可见
-      await expect(priceLocator).toBeVisible({ timeout: 60000 });
-
-      // 使用 toHaveText 进行断言并获取文本，Playwright 会自动等待文本出现
-      // 注意：这里我们使用 innerText() 来获取原始文本用于后续处理
+      await expect(priceLocator).toBeVisible({ timeout: 120000 });
       priceText = await priceLocator.innerText({ timeout: 60000 });
-      console.log(`抓取到的价格文本: ${priceText.trim()}`);
+      console.log(`当前价格: ${priceText.trim()}`);
 
       // 验证价格文本至少包含一个数字或美元符号
       //await expect(priceLocator).toHaveText(/(\$|\d)/, { useInnerText: true });
@@ -96,7 +93,7 @@ async function monitor() {
         if (NOTIFY_URL) {
           console.log("正在发送通知...", NOTIFY_URL);
           try {
-            const ntfyMessage = `${title.trim()}\n=>: $${history.price} => $${currentPrice}\nURL: ${currentURL}`;
+            const ntfyMessage = `${title.trim()}\nPrice: $${history.price} => $${currentPrice}\nURL: ${currentURL}`;
 
             // ⚡️ 修正 4: 使用全局 fetch API 发送通知
             await fetch(NOTIFY_URL, {
