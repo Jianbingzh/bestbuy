@@ -79,10 +79,9 @@ async function monitor() {
     } catch (error) {
       console.error("运行出错:", error);
       process.exit(1);
-    } finally {
-      await browser.close();
     }
-  }
+  } //end for
+  await browser.close();
 }
 
 monitor();
