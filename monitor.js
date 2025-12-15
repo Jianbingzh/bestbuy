@@ -40,19 +40,20 @@ async function monitor() {
         await page.locator(config.preClick.clickLocator).click();
         // 等待点击引起的导航完成，并且新的 URL 可用
         afterClickURL = page.url();
+        console.log("afterClickURL:", afterClickURL);
       } else {
         await page.goto(config.productURL, { waitUntil: "domcontentloaded", timeout: 60000 });
       }
 
       // 提取商品名称
       const title = await page.locator(config.titleLocator).innerText();
-      // 提取价格 (根据页面结构，提取 $ 符号后的数字)
-      // <div data-testid="price-block-customer-price" data-lu-target="customer_price" style="flex-direction:row"><span class="font-sans text-default text-style-body-md-400 font-500 text-7 leading-7">$599.00</span></div>
-      const priceText = await page.locator(config.priceLocator).innerText({ timeout: 60000 });
-      const currentPrice = parseFloat(priceText.replace(/[^0-9.]/g, ""));
-
       console.log(`当前商品: ${title}`);
-      console.log(`当前价格: ${currentPrice}`);
+
+      // 提取价格 (根据页面结构，提取 $ 符号后的数字)
+      const priceText = await page.locator(config.priceLocator).innerText({ timeout: 60000 });
+      console.log(`当前价格: ${priceText}`);
+
+      const currentPrice = parseFloat(priceText.replace(/[^0-9.]/g, ""));
 
       // 读取历史价格
       let history = { price: 0 };
