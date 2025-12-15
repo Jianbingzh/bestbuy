@@ -73,7 +73,7 @@ async function monitor() {
       await expect(priceLocator).toHaveText(/(\$|\d)/, { useInnerText: true });
 
       currentPrice = parseFloat(priceText.replace(/[^0-9.]/g, ""));
-      currentURL = page.url;
+      currentURL = page.url();
 
       // --- 价格对比和通知 ---
       let history = { price: 0 };
