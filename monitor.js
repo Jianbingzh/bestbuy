@@ -62,7 +62,7 @@ async function monitor() {
 
       const priceLocator = page.locator(config.priceLocator);
       // 确保价格元素存在并可见
-      await expect(priceLocator).toBeVisible({ timeout: 120000 });
+      await expect(priceLocator).toBeVisible({ timeout: 300000 });
       priceText = await priceLocator.innerText({ timeout: 60000 });
       console.log(`当前价格: ${priceText.trim()}`);
 
