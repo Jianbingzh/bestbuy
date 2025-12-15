@@ -24,7 +24,7 @@ const CONFIG_ITEMS = [
     preClick: { rootURL: "https://www.bestbuy.com/home", clickLocator: 'a.bottom-left-links:has-text("Deal of the Day")', haveURL: "/deal-of-the-day/" },
     productURL: null,
     titleLocator: "h2.product-title",
-    priceLocator: 'div[data-testid="customer-price"] > span[aria-hidden="true"]',
+    priceLocator: 'div[data-testid="customer-price"]',
     saveLastPrice: "./dealoftoday_last_price.json", // 路径将在 monitor 中解析
   },
 ];
@@ -70,7 +70,8 @@ async function monitor() {
       console.log(`抓取到的价格文本: ${priceText.trim()}`);
 
       // 验证价格文本至少包含一个数字或美元符号
-      await expect(priceLocator).toHaveText(/(\$|\d)/, { useInnerText: true });
+      //await expect(priceLocator).toHaveText(/(\$|\d)/, { useInnerText: true });
+      priceText = priceText.trim().split("\n")[0];
 
       currentPrice = parseFloat(priceText.replace(/[^0-9.]/g, ""));
       currentURL = page.url();
