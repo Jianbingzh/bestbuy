@@ -29,6 +29,46 @@ const CONFIG_ITEMS = [
   },
 ];
 
+/**
+ * 重载 console.log 以添加时间戳
+ */
+function enableTimestampedLogging() {
+  // 1. 备份原生的 console.log 方法
+  const originalLog = console.log;
+
+  // 2. 覆盖 console.log
+  console.log = function (...args) {
+    // 创建一个 Date 对象来获取当前时间
+    const now = new Date();
+
+    // 格式化时间戳
+    // 使用 toLocaleString() 配合选项可以输出包含时区信息的格式化字符串
+    const timestamp = now.toLocaleString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false, // 使用 24 小时制
+      timeZoneName: "short", // 添加时区名称
+    });
+
+    // 格式化输出为 [YYYY/MM/DD, HH:MM:SS TZ]
+    // 示例输出: [12/15/2025, 16:44:52 PST]
+    const formattedTimestamp = `[${timestamp.replace(",", "")}]`;
+
+    // 3. 调用原生的 log 方法，将时间戳作为第一个参数
+    // 使用 Function.prototype.apply() 来确保日志能正确输出
+    originalLog.apply(console, [formattedTimestamp, ...args]);
+  };
+}
+
+// --- 使用方法 ---
+
+// 1. 在代码的入口处调用函数来启用带时间戳的日志
+enableTimestampedLogging();
+
 async function monitor() {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
