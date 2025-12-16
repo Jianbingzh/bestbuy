@@ -51,6 +51,7 @@ function enableTimestampedLogging() {
       minute: "2-digit",
       second: "2-digit",
       hour12: false, // 使用 24 小时制
+      timeZone: "America/Los_Angeles", // <--- 关键：指定时区为洛杉矶
       timeZoneName: "short", // 添加时区名称
     });
 
