@@ -78,7 +78,7 @@ async function monitor() {
   const page = await context.newPage();
 
   for (const config of CONFIG_ITEMS) {
-    let currenTtitle = "未知商品"; // 初始化标题
+    let currentTitle = "未知商品"; // 初始化标题
     let priceText = ""; // 初始化价格文本
     let currentPrice = 0; // 初始化价格数值
     const resolvedSavePath = resolvePath(config.saveLastPrice); // ⚡️ 修正 2: 运行时解析路径
@@ -98,8 +98,8 @@ async function monitor() {
       const titleLocator = page.locator(config.titleLocator);
       // 确保元素存在并可见
       await expect(titleLocator).toBeVisible({ timeout: 60000 });
-      currenTtitle = await titleLocator.innerText().trim();
-      console.log(`当前商品: ${currenTtitle.trim()}`);
+      currentTitle = await titleLocator.innerText().trim();
+      console.log(`当前商品: ${currentTitle.trim()}`);
 
       const priceLocator = page.locator(config.priceLocator);
       // 确保价格元素存在并可见
@@ -129,14 +129,14 @@ async function monitor() {
       }
 
       // 对比价格
-      if (currentPrice !== history.price || currenTtitle !== history.title) {
+      if (currentPrice !== history.price || currentTitle !== history.title) {
         console.log(`发生变化: $${history.price} => $${currentPrice}`);
-        console.log(`发生变化: $${history.title} => $${currenTtitle}`);
+        console.log(`发生变化: $${history.title} => $${currentTitle}`);
 
         if (NOTIFY_URL) {
           console.log("正在发送通知...");
           try {
-            const ntfyMessage = `${title.trim()}\nPrice: $${history.price} => $${currentPrice}\nURL: ${currentURL}`;
+            const ntfyMessage = `${currentTitle.trim()}\nPrice: $${history.price} => $${currentPrice}\nURL: ${currentURL}`;
 
             // ⚡️ 修正 4: 使用全局 fetch API 发送通知
             await fetch(NOTIFY_URL, {
@@ -155,7 +155,7 @@ async function monitor() {
         }
 
         // ⚡️ 修正 5: 使用 fs/promises.writeFile 异步保存新价格
-        await fs.writeFile(resolvedSavePath, JSON.stringify({ price: currentPrice, name: title.trim(), timestamp: new Date().toISOString() }));
+        await fs.writeFile(resolvedSavePath, JSON.stringify({ price: currentPrice, name: currentTitle.trim(), timestamp: new Date().toISOString() }));
         console.log("新价格已保存。");
       } else {
         console.log("价格未变，跳过通知。");
