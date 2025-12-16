@@ -78,7 +78,7 @@ async function monitor() {
   const page = await context.newPage();
 
   for (const config of CONFIG_ITEMS) {
-    let title = "未知商品"; // 初始化标题
+    let currenTtitle = "未知商品"; // 初始化标题
     let priceText = ""; // 初始化价格文本
     let currentPrice = 0; // 初始化价格数值
     const resolvedSavePath = resolvePath(config.saveLastPrice); // ⚡️ 修正 2: 运行时解析路径
@@ -98,8 +98,8 @@ async function monitor() {
       const titleLocator = page.locator(config.titleLocator);
       // 确保元素存在并可见
       await expect(titleLocator).toBeVisible({ timeout: 60000 });
-      title = await titleLocator.innerText();
-      console.log(`当前商品: ${title.trim()}`);
+      currenTtitle = await titleLocator.innerText().trim();
+      console.log(`当前商品: ${currenTtitle.trim()}`);
 
       const priceLocator = page.locator(config.priceLocator);
       // 确保价格元素存在并可见
@@ -129,8 +129,10 @@ async function monitor() {
       }
 
       // 对比价格
-      if (currentPrice !== history.price) {
-        console.log(`价格发生变化: $${history.price} => $${currentPrice}`);
+      if (currentPrice !== history.price || currenTtitle !== history.title) {
+        console.log(`发生变化: $${history.price} => $${currentPrice}`);
+        console.log(`发生变化: $${history.title} => $${currenTtitle}`);
+
         if (NOTIFY_URL) {
           console.log("正在发送通知...");
           try {
