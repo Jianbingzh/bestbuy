@@ -98,7 +98,7 @@ async function monitor() {
       const titleLocator = page.locator(config.titleLocator);
       // 确保元素存在并可见
       await expect(titleLocator).toBeVisible({ timeout: 60000 });
-      currentTitle = await titleLocator.innerText().trim();
+      currentTitle = await titleLocator.innerText();
       console.log(`当前商品: ${currentTitle.trim()}`);
 
       const priceLocator = page.locator(config.priceLocator);
@@ -129,7 +129,7 @@ async function monitor() {
       }
 
       // 对比价格
-      if (currentPrice !== history.price || currentTitle !== history.title) {
+      if (currentPrice !== history.price || currentTitle.trim() !== history.title) {
         console.log(`发生变化: $${history.price} => $${currentPrice}`);
         console.log(`发生变化: $${history.title} => $${currentTitle}`);
 
