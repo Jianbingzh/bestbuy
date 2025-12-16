@@ -99,7 +99,8 @@ async function monitor() {
       // 确保元素存在并可见
       await expect(titleLocator).toBeVisible({ timeout: 60000 });
       currentTitle = await titleLocator.innerText();
-      console.log(`当前商品: ${currentTitle.trim()}`);
+      currentTitle = currentTitle.trim();
+      console.log(`当前商品: ${currentTitle}`);
 
       const priceLocator = page.locator(config.priceLocator);
       // 确保价格元素存在并可见
@@ -115,7 +116,7 @@ async function monitor() {
       currentURL = page.url();
 
       // --- 价格对比和通知 ---
-      let history = { price: 0 };
+      let history = { price: 0, title: "" };
       try {
         const data = await fs.readFile(resolvedSavePath, "utf8");
         history = JSON.parse(data);
@@ -129,14 +130,14 @@ async function monitor() {
       }
 
       // 对比价格
-      if (currentPrice !== history.price || currentTitle.trim() !== history.title) {
+      if (currentPrice !== parseFloat(history.price) || currentTitle !== history.title) {
         console.log(`发生变化: $${history.price} => $${currentPrice}`);
-        console.log(`发生变化: $${history.title} => $${currentTitle}`);
+        console.log(`发生变化: ${history.title} => $${currentTitle}`);
 
         if (NOTIFY_URL) {
           console.log("正在发送通知...");
           try {
-            const ntfyMessage = `${currentTitle.trim()}\nPrice: $${history.price} => $${currentPrice}\nURL: ${currentURL}`;
+            const ntfyMessage = `${currentTitle}\nPrice: $${history.price} => $${currentPrice}\nURL: ${currentURL}`;
 
             // ⚡️ 修正 4: 使用全局 fetch API 发送通知
             await fetch(NOTIFY_URL, {
@@ -155,7 +156,7 @@ async function monitor() {
         }
 
         // ⚡️ 修正 5: 使用 fs/promises.writeFile 异步保存新价格
-        await fs.writeFile(resolvedSavePath, JSON.stringify({ price: currentPrice, name: currentTitle.trim(), timestamp: new Date().toISOString() }));
+        await fs.writeFile(resolvedSavePath, JSON.stringify({ price: currentPrice, title: currentTitle, timestamp: new Date().toISOString() }));
         console.log("新价格已保存。");
       } else {
         console.log("价格未变，跳过通知。");
